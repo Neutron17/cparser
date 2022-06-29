@@ -51,6 +51,27 @@ enum SeparatorType {
 	S_BRACKET_BEGIN,
 	S_BRACKET_END
 };
+
+enum LiteralType {
+	L_TRUE,
+	L_FALSE,
+	L_INT,
+	L_UINT,
+	L_LONG,
+	L_FLOAT,
+	L_DOUBLE
+};
+
+enum IdentifierType {
+	I_VAR,
+	I_VAR_STATIC,
+	I_CONST,
+	I_PTR,
+	I_CONST_PTR,
+	I_FUNC,
+	I_FUNC_INLINE
+};
+
 int strtotype(const char *restrict str, const char *restrict arr[7]);
 
 struct Token {

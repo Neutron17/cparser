@@ -1,39 +1,43 @@
-//#define MEM_DEBUG
-
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <ntr/debug.h>
 #include "tokenizer.h"
+#include "glob.h"
 
-struct Lex {
-	char *lval;
-	char *rval;
-	bool isValid;
-};
-
-char program[] = "int b;int b;short a = b * c ;"
-				 "int b = c ;";
-
-struct Lex parse(const char *txt);
-//struct Lex strtolex(const char *txt);
+char program[] = "int main ( ) { ;\n"
+				 "	int c = { 0 };\n"
+				 "	int d;\n"
+				 "	int b;\n"
+				 "	short a = ( b * c );\n"
+				 "	int bc\n"
+				 "	 = z;\n"
+				 "}";
 
 int main(int argc, const char *argv[]) {
 	List list = tokenize(program);
 	for(int i = 0; i<list.used;i++) {
 		struct Token *toks = ((struct Token *)list.array[i]);
-		printf("%d %s %d\n", toks->type, toks->value, toks->subtype);
-		free((struct Token *)list.array[i]);
+		//printf("%d %s %d\n", toks->type, toks->value, toks->subtype);
+		free(toks);
 	}
 	free(list.array);
-	//struct Lex lex = parse(program);
-	//puts("");
-	//printf("l: '%s'\nr: '%s'\n", lex.lval, lex.rval);
-	//free(lex.lval);
-	//free(lex.rval);
+	//memdeb_print(false);
 	return 0;
 }
+
+// old lexer
+/*struct Lex lex = parse(program);
+	puts("");
+	printf("l: '%s'\nr: '%s'\n", lex.lval, lex.rval);
+	free(lex.lval);
+	free(lex.rval);*/
+/*struct Lex {
+	char *lval;
+	char *rval;
+	bool isValid;
+};
 struct Lex parse(const char *txt) {
 	struct Lex ret = {NULL, NULL, true};
 	//ret = strtolex(txt);
@@ -41,7 +45,7 @@ struct Lex parse(const char *txt) {
 	strncpy(ret.lval, l, 8);
 	while(ret.isValid == true) {
 		printf("bef l: '%s'\nr: '%s'\n", ret.lval, ret.rval);
-		//ret = strtolex(ret.rval);
+		ret = strtolex(ret.rval);
 		printf("aft: l: '%s'\nr: '%s'\n", ret.lval, ret.rval);
 		//free(ret.rval);
 		//free(ret.lval);
@@ -49,7 +53,6 @@ struct Lex parse(const char *txt) {
 	ret.lval = l;
 	return ret;
 }
-/*
 struct Lex strtolex(const char *txt) {
 	//puts(txt);
 	struct Lex ret;
