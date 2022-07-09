@@ -5,14 +5,14 @@
 #include "tokenizer.h"
 #include "glob.h"
 
-void set_add(List *l, void *element) {
+void set_add(Array *l, void *element) {
 	for (int i = 0; i < l->used; ++i) {
 		if(strcmp(((struct Token *)l->array[i])->value, ((struct Token *)element)->value) == 0) {
 			fprintf(stderr, "Multiple definitions of identifier: '%s'\n", ((struct Token *)element)->value);
 			abort();
 		}
 	}
-	list_add(l, (void *)element);
+	array_add(l, (void *) element);
 }
 
 bool set_is_in(Set s, void *n) {

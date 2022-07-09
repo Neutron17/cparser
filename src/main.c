@@ -5,6 +5,7 @@
 #include <string.h>
 #include "tokenizer.h"
 #include "glob.h"
+#include "stdext.h"
 
 char program[] = "int main ( ) { ;\n"
 				 "	int c = { 0 };\n"
@@ -16,13 +17,13 @@ char program[] = "int main ( ) { ;\n"
 				 "}";
 
 int main(int argc, const char *argv[]) {
-	List list = tokenize(program);
-	for(int i = 0; i<list.used;i++) {
-		struct Token *toks = ((struct Token *)list.array[i]);
-		//printf("%d %s %d\n", toks->type, toks->value, toks->subtype);
+	Array array = tokenize(program);
+	for(int i = 0; i<array.used;i++) {
+		struct Token *toks = ((struct Token *)array.array[i]);
+		printf("%d %s %d\n", toks->type, toks->value, toks->subtype);
 		free(toks);
 	}
-	free(list.array);
+	free(array.array);
 	//memdeb_print(false);
 	return 0;
 }

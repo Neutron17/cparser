@@ -1,6 +1,6 @@
 #ifndef _NTR_TOKENIZER_H_
 #define _NTR_TOKENIZER_H_ 1
-#include "list.h"
+#include "array.h"
 
 enum TType {
 	T_IDENTIFIER = 0,
@@ -86,6 +86,6 @@ struct Token {
 };
 struct Token *token(enum TType type, int subtype, char *value);
 
-List tokenize(char *txt);
+Array tokenize(char *txt);
 
 #endif //_NTR_TOKENIZER_H_

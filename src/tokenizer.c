@@ -25,10 +25,14 @@ const char *separators[7] = {
 		";","(",")","{","}","[","]"
 };
 
+static void insert_space(char *txt);
+
 Set identifiers;
 
-List tokenize(char *txt) {
-	List ret = list_create(30);
+Array tokenize(char *txt) {
+	//insert_space(txt);
+	//printf("%s\n", txt);
+	Array ret = array_create(30);
 	identifiers = set_create(10);
 	char *line, *line_sp, *elem_sp;
 	for( line = strtok_r(txt, ";", &line_sp);
@@ -54,43 +58,43 @@ List tokenize(char *txt) {
 				if (strncmp(symbol, keywords[i], 5) == 0) {
 					enum KeyWordType type;
 					type = strtotype(symbol, keywords);
-					list_add(&ret, (void *) token(T_KEYWORD, type, symbol));
+					array_add(&ret, (void *) token(T_KEYWORD, type, symbol));
 					hasFound = true;
 				} else if(strncmp(symbol, "//", 2) == 0) {
 					goto comment;
 				} else if (strncmp(symbol, type_keywords[i], 6) == 0) {
 					enum KeyWordType type;
 					type = strtotype(symbol, type_keywords);
-					list_add(&ret, (void *) token(T_TYPE_KEYWORD, type, symbol));
+					array_add(&ret, (void *) token(T_TYPE_KEYWORD, type, symbol));
 					hasFound = true;
 				} else if (strncmp(symbol, operators[i], 1) == 0) {
 					enum KeyWordType type;
 					type = strtotype(symbol, operators);
-					list_add(&ret, (void *) token(T_OPERATOR, type, symbol));
+					array_add(&ret, (void *) token(T_OPERATOR, type, symbol));
 					hasFound = true;
 				} else if (strncmp(symbol, separators[i], 1) == 0) {
 					enum KeyWordType type;
 					type = strtotype(symbol, separators);
-					list_add(&ret, (void *) token(T_SEPARATOR, type, symbol));
+					array_add(&ret, (void *) token(T_SEPARATOR, type, symbol));
 					hasFound = true;
 				}
 			}
 			if (!hasFound) { // literal or identifier
 				if(strncmp(symbol, "true", 4) == 0) {
-					list_add(&ret, (void *) token(T_LITERAL, L_TRUE, symbol));
+					array_add(&ret, (void *) token(T_LITERAL, L_TRUE, symbol));
 				} else if(strncmp(symbol, "false", 4) == 0) {
-					list_add(&ret, (void *) token(T_LITERAL, L_FALSE, symbol));
+					array_add(&ret, (void *) token(T_LITERAL, L_FALSE, symbol));
 				} else if(isDouble(symbol)/*({ strtol(symbol, NULL, 10), errno; }) != EINVAL*/) {
 					if(isFloat(symbol))
-						list_add(&ret, (void *) token(T_LITERAL, L_FLOAT, symbol));
+						array_add(&ret, (void *) token(T_LITERAL, L_FLOAT, symbol));
 					else if(isDouble(symbol))
-						list_add(&ret, (void *) token(T_LITERAL, L_DOUBLE, symbol));
+						array_add(&ret, (void *) token(T_LITERAL, L_DOUBLE, symbol));
 					else if(isLong(symbol))
-						list_add(&ret, (void *) token(T_LITERAL, L_LONG, symbol));
+						array_add(&ret, (void *) token(T_LITERAL, L_LONG, symbol));
 					else if(isUnsigned(symbol))
-						list_add(&ret, (void *) token(T_LITERAL, L_UINT, symbol));
+						array_add(&ret, (void *) token(T_LITERAL, L_UINT, symbol));
 					else
-						list_add(&ret, (void *) token(T_LITERAL, L_INT, symbol));
+						array_add(&ret, (void *) token(T_LITERAL, L_INT, symbol));
 				} else {
 					for(int i = 0; i < strlen(symbol); i++) {
 						if(isspace(symbol[i])) {
@@ -98,11 +102,11 @@ List tokenize(char *txt) {
 							abort();
 						}
 					}
-					list_add(&ret, (void *) token(T_IDENTIFIER, 0, symbol));
+					array_add(&ret, (void *) token(T_IDENTIFIER, 0, symbol));
 				}
 			}
 		}
-		list_add(&ret, (void *) token(T_SEPARATOR, S_SEMICOL, ";"));
+		array_add(&ret, (void *) token(T_SEPARATOR, S_SEMICOL, ";"));
 comment:;
 	}
 	// rules
@@ -239,6 +243,7 @@ comment:;
 						continue;
 					} else {
 						fprintf(stderr, "Use of undeclared identifier: '%s'\n", curr->value);
+						abort();
 					}
 				}
 				set_add(&identifiers, (void *)curr);
@@ -260,6 +265,18 @@ comment:;
 		printf("%s\n", ((struct Token *)identifiers.array[i])->value);
 	set_destroy(&identifiers);
 	return ret;
+}
+
+static void insert_space(char *txt) {
+	for(int i = 0; i < strlen(txt); i++) {
+		if(txt[i] == '{' || txt[i] == '}' || txt[i] == '(' || txt[i] == ')' ||
+		   txt[i] == '[' || txt[i] == ']' || txt[i] == '+' || txt[i] == '-' ||
+		   txt[i] == '*' || txt[i] == '/' || txt[i] == '=' || txt[i] == '%' ||
+		   txt[i] == '&' || txt[i] == '|' || txt[i] == '!' || txt[i] == '?') {
+			//append(txt, " ", i);
+			//append(txt, " ", i+1);
+		}
+	}
 }
 
 struct Token *token(enum TType type, int subtype, char *value){
